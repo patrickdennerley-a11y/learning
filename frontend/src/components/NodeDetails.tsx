@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { TopicNode } from '../types';
+import { FileText, CreditCard, ClipboardList, Headphones, ChevronLeft, ChevronRight, ArrowRight, Download } from 'lucide-react';
 
 interface NodeDetailsProps {
   node: TopicNode;
@@ -12,10 +13,10 @@ export const NodeDetails = ({ node, onTakeFinalExam }: NodeDetailsProps) => {
   const [showFlashcardBack, setShowFlashcardBack] = useState(false);
 
   const tabs = [
-    { id: 'cheatsheet' as const, label: 'Cheat Sheet' },
-    { id: 'flashcards' as const, label: 'Flashcards' },
-    { id: 'practice' as const, label: 'Practice Exams' },
-    { id: 'audio' as const, label: 'Audio Summary' },
+    { id: 'cheatsheet' as const, label: 'Cheat Sheet', icon: FileText },
+    { id: 'flashcards' as const, label: 'Flashcards', icon: CreditCard },
+    { id: 'practice' as const, label: 'Practice', icon: ClipboardList },
+    { id: 'audio' as const, label: 'Audio', icon: Headphones },
   ];
 
   const nextFlashcard = () => {
@@ -31,148 +32,158 @@ export const NodeDetails = ({ node, onTakeFinalExam }: NodeDetailsProps) => {
   };
 
   return (
-    <div style={{ padding: '20px', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-      <h2 style={{ marginTop: 0 }}>{node.title}</h2>
-      <p style={{ color: '#666' }}>{node.description}</p>
-
-      {/* Tabs */}
-      <div style={{ borderBottom: '2px solid #ddd', marginBottom: '20px' }}>
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            style={{
-              padding: '10px 20px',
-              border: 'none',
-              background: activeTab === tab.id ? '#007bff' : 'transparent',
-              color: activeTab === tab.id ? 'white' : '#333',
-              cursor: 'pointer',
-              fontWeight: activeTab === tab.id ? 'bold' : 'normal',
-              borderRadius: '4px 4px 0 0',
-              marginRight: '5px',
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
+    <div className="glass-dark rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-primary-500/20 to-accent-500/20 p-6 border-b border-white/10">
+        <h2 className="text-2xl font-bold text-white mb-2">{node.title}</h2>
+        <p className="text-slate-300 text-sm">{node.description}</p>
       </div>
 
-      {/* Cheat Sheet Tab */}
-      {activeTab === 'cheatsheet' && (
-        <div>
-          <h3>{node.resources.cheatSheet.title}</h3>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ backgroundColor: '#007bff', color: 'white' }}>
-                <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #ddd' }}>Formula</th>
-                <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #ddd' }}>Description</th>
-              </tr>
-            </thead>
-            <tbody>
+      {/* Tabs */}
+      <div className="flex space-x-1 p-2 bg-slate-900/30 border-b border-white/5">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 flex items-center justify-center space-x-2 px-4 py-3 rounded-lg transition-all duration-200 ${
+                activeTab === tab.id
+                  ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-lg shadow-primary-500/20'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              <span className="text-sm font-medium">{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Content */}
+      <div className="p-6">
+        {/* Cheat Sheet Tab */}
+        {activeTab === 'cheatsheet' && (
+          <div className="animate-fade-in">
+            <h3 className="text-lg font-semibold text-white mb-4">{node.resources.cheatSheet.title}</h3>
+            <div className="space-y-2">
               {node.resources.cheatSheet.formulas.map((item, idx) => (
-                <tr key={idx} style={{ backgroundColor: idx % 2 === 0 ? 'white' : '#f2f2f2' }}>
-                  <td style={{ padding: '10px', fontFamily: 'monospace', border: '1px solid #ddd' }}>
-                    {item.formula}
-                  </td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{item.description}</td>
-                </tr>
+                <div
+                  key={idx}
+                  className="glass rounded-lg p-4 border border-primary-500/20 hover:border-primary-500/40 transition-all duration-200 card-hover"
+                >
+                  <div className="flex items-start space-x-4">
+                    <div className="flex-1">
+                      <code className="text-primary-300 font-mono text-sm block mb-1">
+                        {item.formula}
+                      </code>
+                      <p className="text-slate-400 text-sm">{item.description}</p>
+                    </div>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Flashcards Tab */}
-      {activeTab === 'flashcards' && (
-        <div style={{ textAlign: 'center' }}>
-          <div
-            onClick={() => setShowFlashcardBack(!showFlashcardBack)}
-            style={{
-              minHeight: '200px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: 'white',
-              border: '2px solid #007bff',
-              borderRadius: '8px',
-              padding: '30px',
-              cursor: 'pointer',
-              fontSize: '18px',
-              marginBottom: '20px',
-            }}
-          >
-            {showFlashcardBack
-              ? node.resources.flashcards[currentFlashcardIndex].back
-              : node.resources.flashcards[currentFlashcardIndex].front}
-          </div>
-          <div style={{ marginBottom: '10px', color: '#666' }}>
-            Card {currentFlashcardIndex + 1} of {node.resources.flashcards.length}
-            {' | '}
-            Click card to flip
-          </div>
-          <button onClick={prevFlashcard} style={{ margin: '0 10px', padding: '8px 16px' }}>
-            ← Previous
-          </button>
-          <button onClick={nextFlashcard} style={{ margin: '0 10px', padding: '8px 16px' }}>
-            Next →
-          </button>
-        </div>
-      )}
-
-      {/* Practice Exams Tab */}
-      {activeTab === 'practice' && (
-        <div>
-          {node.resources.practiceExams.map((exam) => (
-            <div key={exam.id} style={{ marginBottom: '20px' }}>
-              <h3>{exam.title}</h3>
-              <p style={{ color: '#666' }}>{exam.questions.length} questions</p>
-              <button style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                Start Practice Exam
-              </button>
-              {exam.downloadUrl && (
-                <button style={{ marginLeft: '10px', padding: '10px 20px', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                  Download PDF
-                </button>
-              )}
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        )}
 
-      {/* Audio Summary Tab */}
-      {activeTab === 'audio' && (
-        <div>
-          <h3>{node.resources.audioSummary.title}</h3>
-          <p style={{ color: '#666' }}>Duration: {node.resources.audioSummary.duration}</p>
-          <audio controls style={{ width: '100%' }}>
-            <source src={node.resources.audioSummary.audioUrl} type="audio/mpeg" />
-            Your browser does not support the audio element.
-          </audio>
-          <p style={{ fontSize: '12px', color: '#999', marginTop: '10px' }}>
-            Note: Audio files are placeholder URLs. Add actual audio files to make them functional.
-          </p>
-        </div>
-      )}
+        {/* Flashcards Tab */}
+        {activeTab === 'flashcards' && (
+          <div className="animate-fade-in">
+            <div
+              onClick={() => setShowFlashcardBack(!showFlashcardBack)}
+              className="min-h-[300px] glass rounded-2xl p-8 border-2 border-primary-500/30 cursor-pointer transition-all duration-300 hover:border-primary-500/50 hover:shadow-2xl hover:shadow-primary-500/20 flex items-center justify-center"
+            >
+              <div className="text-center">
+                <p className="text-lg text-white font-medium">
+                  {showFlashcardBack
+                    ? node.resources.flashcards[currentFlashcardIndex].back
+                    : node.resources.flashcards[currentFlashcardIndex].front}
+                </p>
+              </div>
+            </div>
 
-      {/* Final Exam Button */}
-      <div style={{ marginTop: '30px', paddingTop: '20px', borderTop: '2px solid #ddd' }}>
+            <div className="mt-6 flex items-center justify-between">
+              <button
+                onClick={prevFlashcard}
+                className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-slate-700/50 hover:bg-slate-700 text-white transition-all duration-200 hover:scale-105"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                <span className="text-sm">Previous</span>
+              </button>
+
+              <div className="text-center">
+                <p className="text-sm text-slate-400">
+                  Card {currentFlashcardIndex + 1} of {node.resources.flashcards.length}
+                </p>
+                <p className="text-xs text-slate-500 mt-1">Click card to flip</p>
+              </div>
+
+              <button
+                onClick={nextFlashcard}
+                className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-slate-700/50 hover:bg-slate-700 text-white transition-all duration-200 hover:scale-105"
+              >
+                <span className="text-sm">Next</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Practice Exams Tab */}
+        {activeTab === 'practice' && (
+          <div className="animate-fade-in space-y-4">
+            {node.resources.practiceExams.map((exam) => (
+              <div
+                key={exam.id}
+                className="glass rounded-xl p-6 border border-accent-500/20 hover:border-accent-500/40 transition-all duration-200 card-hover"
+              >
+                <h3 className="text-lg font-semibold text-white mb-2">{exam.title}</h3>
+                <p className="text-slate-400 text-sm mb-4">{exam.questions.length} questions</p>
+                <div className="flex space-x-3">
+                  <button className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white transition-all duration-200 hover:scale-105">
+                    <span className="text-sm font-medium">Start Practice</span>
+                  </button>
+                  {exam.downloadUrl && (
+                    <button className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-slate-700/50 hover:bg-slate-700 text-slate-300 transition-all duration-200 hover:scale-105">
+                      <Download className="w-4 h-4" />
+                      <span className="text-sm">Download PDF</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Audio Summary Tab */}
+        {activeTab === 'audio' && (
+          <div className="animate-fade-in">
+            <div className="glass rounded-xl p-6 border border-purple-500/20">
+              <h3 className="text-lg font-semibold text-white mb-2">{node.resources.audioSummary.title}</h3>
+              <p className="text-slate-400 text-sm mb-4">Duration: {node.resources.audioSummary.duration}</p>
+              <audio controls className="w-full">
+                <source src={node.resources.audioSummary.audioUrl} type="audio/mpeg" />
+                Your browser does not support the audio element.
+              </audio>
+              <p className="text-xs text-slate-500 mt-3">
+                Note: Audio files are placeholder URLs. Add actual audio files to make them functional.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Final Exam CTA */}
+      <div className="p-6 bg-gradient-to-r from-primary-900/20 to-accent-900/20 border-t border-white/10">
         <button
           onClick={onTakeFinalExam}
-          style={{
-            padding: '15px 30px',
-            backgroundColor: '#dc3545',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            cursor: 'pointer',
-          }}
+          className="w-full flex items-center justify-center space-x-2 px-6 py-4 rounded-xl bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 text-white font-semibold transition-all duration-200 hover:scale-[1.02] shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50"
         >
-          Take Final Exam →
+          <span>Take Final Exam</span>
+          <ArrowRight className="w-5 h-5" />
         </button>
-        <p style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
-          You need to score &gt;50% to unlock the next topic
+        <p className="text-center text-xs text-slate-400 mt-3">
+          Score &gt;50% to unlock the next topic
         </p>
       </div>
     </div>

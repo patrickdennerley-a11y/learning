@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { TopicNode } from '../types';
+import { CheckCircle2, XCircle, ChevronLeft, ChevronRight, X, Trophy, TrendingDown } from 'lucide-react';
 
 interface FinalExamProps {
   node: TopicNode;
@@ -56,213 +57,215 @@ export const FinalExam = ({ node, onExamComplete, onCancel }: FinalExamProps) =>
   };
 
   const allQuestionsAnswered = exam.questions.every(q => selectedAnswers[q.id] !== undefined);
+  const passed = score > exam.passingScore;
 
   if (showResults) {
-    const passed = score > exam.passingScore;
     return (
-      <div style={{ padding: '20px', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-        <h2>Exam Results</h2>
-        <div
-          style={{
-            padding: '30px',
-            backgroundColor: passed ? '#d4edda' : '#f8d7da',
-            border: `2px solid ${passed ? '#28a745' : '#dc3545'}`,
-            borderRadius: '8px',
-            textAlign: 'center',
-            marginBottom: '20px',
-          }}
-        >
-          <h1 style={{ margin: '0 0 10px 0', color: passed ? '#155724' : '#721c24' }}>
-            {passed ? '✓ Passed!' : '✗ Failed'}
-          </h1>
-          <p style={{ fontSize: '24px', fontWeight: 'bold', margin: '10px 0' }}>
-            Score: {score.toFixed(1)}%
-          </p>
-          <p style={{ fontSize: '16px', color: '#666' }}>
-            Passing Score: &gt;{exam.passingScore}%
-          </p>
-          <p style={{ fontSize: '14px', marginTop: '15px' }}>
-            Correct Answers: {Math.round((score / 100) * totalQuestions)} / {totalQuestions}
-          </p>
+      <div className="glass-dark rounded-2xl border border-white/10 shadow-2xl overflow-hidden animate-scale-in">
+        {/* Results Header */}
+        <div className={`p-8 bg-gradient-to-r ${passed ? 'from-emerald-500/20 to-emerald-600/20' : 'from-red-500/20 to-red-600/20'} border-b border-white/10`}>
+          <div className="text-center">
+            <div className="inline-block p-4 rounded-full bg-gradient-to-br from-white/10 to-white/5 mb-4">
+              {passed ? (
+                <Trophy className="w-16 h-16 text-emerald-400" />
+              ) : (
+                <TrendingDown className="w-16 h-16 text-red-400" />
+              )}
+            </div>
+            <h2 className={`text-4xl font-bold mb-2 ${passed ? 'text-emerald-400' : 'text-red-400'}`}>
+              {passed ? 'Congratulations!' : 'Keep Practicing'}
+            </h2>
+            <p className="text-white text-xl font-semibold mb-2">
+              {score.toFixed(1)}%
+            </p>
+            <p className="text-slate-300 text-sm">
+              You answered {Math.round((score / 100) * totalQuestions)} out of {totalQuestions} questions correctly
+            </p>
+          </div>
         </div>
 
-        <div style={{ marginBottom: '20px' }}>
-          <h3>Question Review:</h3>
-          {exam.questions.map((question, idx) => {
-            const userAnswer = selectedAnswers[question.id];
-            const isCorrect = userAnswer === question.correctAnswer;
-            return (
-              <div
-                key={question.id}
-                style={{
-                  padding: '15px',
-                  backgroundColor: 'white',
-                  border: `2px solid ${isCorrect ? '#28a745' : '#dc3545'}`,
-                  borderRadius: '8px',
-                  marginBottom: '10px',
-                }}
-              >
-                <p style={{ fontWeight: 'bold' }}>
-                  Question {idx + 1}: {question.question}
-                </p>
-                <p style={{ color: isCorrect ? '#28a745' : '#dc3545' }}>
-                  Your answer: {question.options[userAnswer]} {isCorrect ? '✓' : '✗'}
-                </p>
-                {!isCorrect && (
-                  <p style={{ color: '#28a745' }}>
-                    Correct answer: {question.options[question.correctAnswer]}
-                  </p>
-                )}
+        {/* Question Review */}
+        <div className="p-6 max-h-[500px] overflow-y-auto">
+          <h3 className="text-lg font-semibold text-white mb-4">Review Your Answers</h3>
+          <div className="space-y-3">
+            {exam.questions.map((question, idx) => {
+              const userAnswer = selectedAnswers[question.id];
+              const isCorrect = userAnswer === question.correctAnswer;
+              return (
+                <div
+                  key={question.id}
+                  className={`glass rounded-xl p-4 border-2 ${
+                    isCorrect ? 'border-emerald-500/30' : 'border-red-500/30'
+                  } transition-all duration-200`}
+                >
+                  <div className="flex items-start space-x-3">
+                    <div className="flex-shrink-0 mt-1">
+                      {isCorrect ? (
+                        <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                      ) : (
+                        <XCircle className="w-5 h-5 text-red-400" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white font-medium mb-2">
+                        Question {idx + 1}: {question.question}
+                      </p>
+                      <p className={`text-sm mb-1 ${isCorrect ? 'text-emerald-400' : 'text-red-400'}`}>
+                        Your answer: {question.options[userAnswer]}
+                      </p>
+                      {!isCorrect && (
+                        <p className="text-sm text-emerald-400">
+                          Correct answer: {question.options[question.correctAnswer]}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Action Button */}
+        <div className="p-6 bg-gradient-to-r from-primary-900/20 to-accent-900/20 border-t border-white/10">
+          {passed ? (
+            <div className="space-y-3">
+              <div className="glass rounded-lg p-4 border border-emerald-500/30 text-center">
+                <p className="text-emerald-400 font-medium mb-1">Next topic unlocked!</p>
+                <p className="text-slate-400 text-sm">You can now continue your learning journey</p>
               </div>
-            );
-          })}
+              <button
+                onClick={onCancel}
+                className="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 text-white font-semibold transition-all duration-200 hover:scale-[1.02] shadow-lg"
+              >
+                Continue Learning
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="glass rounded-lg p-4 border border-red-500/30 text-center">
+                <p className="text-red-400 font-medium mb-1">Review and try again</p>
+                <p className="text-slate-400 text-sm">Study the materials and retake the exam to unlock the next topic</p>
+              </div>
+              <button
+                onClick={onCancel}
+                className="w-full px-6 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-all duration-200 hover:scale-[1.02]"
+              >
+                Back to Resources
+              </button>
+            </div>
+          )}
         </div>
-
-        {passed ? (
-          <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: '16px', color: '#28a745', marginBottom: '15px' }}>
-              Congratulations! You've unlocked the next topic.
-            </p>
-            <button
-              onClick={onCancel}
-              style={{
-                padding: '15px 30px',
-                backgroundColor: '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                fontSize: '16px',
-                cursor: 'pointer',
-              }}
-            >
-              Continue Learning
-            </button>
-          </div>
-        ) : (
-          <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: '16px', color: '#721c24', marginBottom: '15px' }}>
-              Review the material and try again to unlock the next topic.
-            </p>
-            <button
-              onClick={onCancel}
-              style={{
-                padding: '15px 30px',
-                backgroundColor: '#6c757d',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                fontSize: '16px',
-                cursor: 'pointer',
-              }}
-            >
-              Back to Resources
-            </button>
-          </div>
-        )}
       </div>
     );
   }
 
   return (
-    <div style={{ padding: '20px', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h2>Final Exam: {node.title}</h2>
-        <button
-          onClick={onCancel}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#6c757d',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-          }}
-        >
-          Cancel
-        </button>
+    <div className="glass-dark rounded-2xl border border-white/10 shadow-2xl overflow-hidden animate-scale-in">
+      {/* Exam Header */}
+      <div className="bg-gradient-to-r from-primary-500/20 to-accent-500/20 p-6 border-b border-white/10">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-1">Final Exam</h2>
+            <p className="text-slate-300 text-sm">{node.title}</p>
+          </div>
+          <button
+            onClick={onCancel}
+            className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 transition-all duration-200 hover:scale-110"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
-      <div style={{ marginBottom: '20px', padding: '10px', backgroundColor: '#fff3cd', borderRadius: '4px' }}>
-        <p style={{ margin: 0, fontSize: '14px' }}>
-          Question {currentQuestionIndex + 1} of {totalQuestions} | Score &gt;50% to pass
-        </p>
-      </div>
-
-      <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
-        <h3 style={{ marginTop: 0 }}>{currentQuestion.question}</h3>
-        <div>
-          {currentQuestion.options.map((option, idx) => (
+      {/* Progress Bar */}
+      <div className="px-6 pt-6">
+        <div className="glass rounded-lg p-4 border border-primary-500/20">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-slate-300">
+              Question {currentQuestionIndex + 1} of {totalQuestions}
+            </span>
+            <span className="text-sm text-slate-400">
+              Answered: {Object.keys(selectedAnswers).length}/{totalQuestions}
+            </span>
+          </div>
+          <div className="bg-slate-800 rounded-full h-2 overflow-hidden">
             <div
-              key={idx}
-              onClick={() => handleAnswerSelect(idx)}
-              style={{
-                padding: '15px',
-                marginBottom: '10px',
-                backgroundColor: selectedAnswers[currentQuestion.id] === idx ? '#007bff' : '#f8f9fa',
-                color: selectedAnswers[currentQuestion.id] === idx ? 'white' : '#333',
-                border: '2px solid #ddd',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontWeight: selectedAnswers[currentQuestion.id] === idx ? 'bold' : 'normal',
-              }}
-            >
-              {String.fromCharCode(65 + idx)}. {option}
-            </div>
-          ))}
+              className="h-full bg-gradient-to-r from-primary-500 to-accent-500 transition-all duration-300"
+              style={{ width: `${((currentQuestionIndex + 1) / totalQuestions) * 100}%` }}
+            ></div>
+          </div>
         </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <button
-          onClick={handlePrevious}
-          disabled={currentQuestionIndex === 0}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: currentQuestionIndex === 0 ? '#e2e3e5' : '#6c757d',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: currentQuestionIndex === 0 ? 'not-allowed' : 'pointer',
-          }}
-        >
-          ← Previous
-        </button>
-
-        <div style={{ fontSize: '14px', color: '#666' }}>
-          Answered: {Object.keys(selectedAnswers).length} / {totalQuestions}
+      {/* Question */}
+      <div className="p-6">
+        <div className="glass rounded-xl p-6 border border-white/5 mb-6">
+          <h3 className="text-lg font-semibold text-white mb-6">{currentQuestion.question}</h3>
+          <div className="space-y-3">
+            {currentQuestion.options.map((option, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleAnswerSelect(idx)}
+                className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
+                  selectedAnswers[currentQuestion.id] === idx
+                    ? 'bg-gradient-to-r from-primary-500/20 to-accent-500/20 border-primary-500 shadow-lg shadow-primary-500/20'
+                    : 'bg-white/5 border-white/10 hover:border-white/20 hover:bg-white/10'
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <div
+                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                      selectedAnswers[currentQuestion.id] === idx
+                        ? 'border-primary-400 bg-primary-500'
+                        : 'border-slate-500'
+                    }`}
+                  >
+                    {selectedAnswers[currentQuestion.id] === idx && (
+                      <div className="w-2 h-2 rounded-full bg-white"></div>
+                    )}
+                  </div>
+                  <span className={`text-sm font-medium ${
+                    selectedAnswers[currentQuestion.id] === idx ? 'text-white' : 'text-slate-300'
+                  }`}>
+                    {String.fromCharCode(65 + idx)}. {option}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
 
-        {currentQuestionIndex < totalQuestions - 1 ? (
+        {/* Navigation */}
+        <div className="flex items-center justify-between">
           <button
-            onClick={handleNext}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-            }}
+            onClick={handlePrevious}
+            disabled={currentQuestionIndex === 0}
+            className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-slate-700/50 hover:bg-slate-700 text-white transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            Next →
+            <ChevronLeft className="w-4 h-4" />
+            <span className="text-sm">Previous</span>
           </button>
-        ) : (
-          <button
-            onClick={handleSubmit}
-            disabled={!allQuestionsAnswered}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: allQuestionsAnswered ? '#28a745' : '#e2e3e5',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: allQuestionsAnswered ? 'pointer' : 'not-allowed',
-              fontWeight: 'bold',
-            }}
-          >
-            Submit Exam
-          </button>
-        )}
+
+          {currentQuestionIndex < totalQuestions - 1 ? (
+            <button
+              onClick={handleNext}
+              className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 text-white transition-all duration-200 hover:scale-105 shadow-lg shadow-primary-500/20"
+            >
+              <span className="text-sm">Next</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          ) : (
+            <button
+              onClick={handleSubmit}
+              disabled={!allQuestionsAnswered}
+              className="flex items-center space-x-2 px-6 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg shadow-emerald-500/20"
+            >
+              <span className="text-sm">Submit Exam</span>
+              <CheckCircle2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
